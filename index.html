@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер гамм и ладов</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .controls select, .controls button {
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .controls select {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+        }
+
+        .controls button {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .controls button:hover {
+            background-color: #2980b9;
+        }
+
+        .guitar-fretboard {
+            display: flex;
+            flex-direction: column;
+            background-color: #8b4513;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .string {
+            display: flex;
+            position: relative;
+            margin: 8px 0;
+        }
+
+        .string::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #666;
+            z-index: 0;
+        }
+
+        .fret {
+            width: 50px;
+            height: 50px;
+            margin: 0 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+            font-weight: bold;
+            color: #333;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .fret:hover {
+            transform: scale(1.1);
+        }
+
+        .fret.active {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .fret-number {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #333;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #333;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Тренажер гамм и ладов</h1>
+
+    <div class="controls">
+        <select id="scaleSelect">
+            <!-- Минорные пентатоники -->
+            <option value="AminorPentatonic">Ля минорная пентатоника</option>
+            <option value="BminorPentatonic">Си минорная пентатоника</option>
+            <option value="CminorPentatonic">До минорная пентатоника</option>
+            <option value="DminorPentatonic">Ре минорная пентатоника</option>
+            <option value="EminorPentatonic">Ми минорная пентатоника</option>
+            <option value="FminorPentatonic">Фа минорная пентатоника</option>
+            <option value="GminorPentatonic">Соль минорная пентатоника</option>
+            <!-- Мажорные пентатоники -->
+            <option value="CmajorPentatonic">До мажорная пентатоника</option>
+            <option value="DmajorPentatonic">Ре мажорная пентатоника</option>
+            <option value="EmajorPentatonic">Ми мажорная пентатоника</option>
+            <option value="FmajorPentatonic">Фа мажорная пентатоника</option>
+            <option value="GmajorPentatonic">Соль мажорная пентатоника</option>
+            <option value="AmajorPentatonic">Ля мажорная пентатоника</option>
+            <option value="BmajorPentatonic">Си мажорная пентатоника</option>
+        </select>
+        <button onclick="showScale()">Показать гамму</button>
+    </div>
+
+    <div class="guitar-fretboard" id="guitarFretboard">
+        <!-- Струны и лады будут добавлены через JavaScript -->
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <script>
+        const scales = {
+            // Минорные пентатоники
+            AminorPentatonic: {
+                name: "Ля минорная пентатоника",
+                notes: ["A", "C", "D", "E", "G"]
+            },
+            BminorPentatonic: {
+                name: "Си минорная пентатоника",
+                notes: ["B", "D", "E", "F#", "A"]
+            },
+            CminorPentatonic: {
+                name: "До минорная пентатоника",
+                notes: ["C", "D#", "F", "G", "A#"]
+            },
+            DminorPentatonic: {
+                name: "Ре минорная пентатоника",
+                notes: ["D", "F", "G", "A", "C"]
+            },
+            EminorPentatonic: {
+                name: "Ми минорная пентатоника",
+                notes: ["E", "G", "A", "B", "D"]
+            },
+            FminorPentatonic: {
+                name: "Фа минорная пентатоника",
+                notes: ["F", "G#", "A#", "C", "D#"]
+            },
+            GminorPentatonic: {
+                name: "Соль минорная пентатоника",
+                notes: ["G", "A#", "C", "D", "F"]
+            },
+            // Мажорные пентатоники
+            CmajorPentatonic: {
+                name: "До мажорная пентатоника",
+                notes: ["C", "D", "E", "G", "A"]
+            },
+            DmajorPentatonic: {
+                name: "Ре мажорная пентатоника",
+                notes: ["D", "E", "F#", "A", "B"]
+            },
+            EmajorPentatonic: {
+                name: "Ми мажорная пентатоника",
+                notes: ["E", "F#", "G#", "B", "C#"]
+            },
+            FmajorPentatonic: {
+                name: "Фа мажорная пентатоника",
+                notes: ["F", "G", "A", "C", "D"]
+            },
+            GmajorPentatonic: {
+                name: "Соль мажорная пентатоника",
+                notes: ["G", "A", "B", "D", "E"]
+            },
+            AmajorPentatonic: {
+                name: "Ля мажорная пентатоника",
+                notes: ["A", "B", "C#", "E", "F#"]
+            },
+            BmajorPentatonic: {
+                name: "Си мажорная пентатоника",
+                notes: ["B", "C#", "D#", "F#", "G#"]
+            }
+        };
+
+        const fretboard = [
+            ["E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E"],
+            ["B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
+            ["G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G"],
+            ["D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D"],
+            ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A"],
+            ["E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E"]
+        ];
+
+        const guitarFretboard = document.getElementById('guitarFretboard');
+        const messageDisplay = document.getElementById('message');
+
+        // Создание грифа
+        function createFretboard() {
+            guitarFretboard.innerHTML = '';
+            fretboard.forEach((string, stringIndex) => {
+                const stringDiv = document.createElement('div');
+                stringDiv.className = 'string';
+                string.forEach((note, fretIndex) => {
+                    const fret = document.createElement('div');
+                    fret.className = 'fret';
+                    fret.textContent = note;
+                    fret.dataset.note = note;
+                    fret.dataset.string = stringIndex;
+                    fret.dataset.fret = fretIndex;
+
+                    // Добавляем номер лада снизу
+                    if (stringIndex === fretboard.length - 1) {
+                        const fretNumber = document.createElement('div');
+                        fretNumber.className = 'fret-number';
+                        fretNumber.textContent = fretIndex;
+                        fret.appendChild(fretNumber);
+                    }
+
+                    stringDiv.appendChild(fret);
+                });
+                guitarFretboard.appendChild(stringDiv);
+            });
+        }
+
+        // Показать выбранную гамму
+        function showScale() {
+            const selectedScale = document.getElementById('scaleSelect').value;
+            const scaleNotes = scales[selectedScale].notes;
+            messageDisplay.textContent = `Гамма: ${scales[selectedScale].name}`;
+
+            const allFrets = document.querySelectorAll('.fret');
+            allFrets.forEach(fret => {
+                if (scaleNotes.includes(fret.dataset.note)) {
+                    fret.classList.add('active');
+                } else {
+                    fret.classList.remove('active');
+                }
+            });
+        }
+
+        // Инициализация
+        createFretboard();
+    </script>
+</body>
+</html>
